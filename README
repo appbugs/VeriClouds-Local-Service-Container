@@ -1,0 +1,21 @@
+VeriClouds Local Service encrypts and syncs the VeriClouds cloud database of compromised credentials to your local environment so that you can use the database in local without disclosing any information to VeriClouds cloud.
+
+How to use
+1. Download files from this repository to a file such as c:\vericlouds_replica_container. There should be two files: my.cnf and Dockerfile
+2. open my.cnf, add server_id=<<server_id>>
+3. Install Docker: https://www.docker.com/
+4. Run Docker Terminal, run following commands to build and run the docker container
+cd c:\vericlouds_replica_container
+docker build -t vericlouds/local-service .
+docker run -d -p 80:80 -p 3306:3306 vericlouds/local-service
+5. Now in a browser visit http://<<docker_container_ip>>, you will see the web service is up and running.
+6. We then need to setup database replication which will sync the Master database in VeriClouds cloud to your local database
+    1) run docker logs command to get the admin password of mysql
+    2) use PHPMyAdmin to connect to the database in the container with the admin username and password you obtained in step 1
+    3) create a database named "vericlouds_replica"
+    4) Go to "Replication" tab, click on "configure" under "Slave Replication"
+    5) Put following information and click Go: username=<<repl_username>>,password=<<repl_password>>,host=vericlouds.com,port=3306
+    6) Go to "Replication" tab again, you will see an error message "Slave SQL Thread Not Running". Click "Control slave" then click "Full Start"
+7. Now in a browser visit http://<<docker_container_ip>> again, you will see how many records have been loaded to the local db.
+
+
